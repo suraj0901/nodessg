@@ -9,7 +9,7 @@ const fetch = require('node-fetch')
 const param = process.argv.slice(2), index = param[0], dev = param[1] === "--dev"
 console.log(param);
 
-const { config, main } = require(__dirname + '/' +index)
+const config= require(__dirname + '/' +index)
 
 const $fetch = async (path) => {
   try {
@@ -112,7 +112,7 @@ const $html = async (data, input, output) => {
 
 mkdir(config.output)
 
-main({$html, $include, $each, $fetch, $passCopy})
+config.main({$html, $include, $each, $fetch, $passCopy})
   .then(() => {
     if (dev) {
       const p = (param[2] === "-p")
