@@ -4,17 +4,13 @@
   "description": "A simple node static site genrator",
   "main": "index.js",
   "bin": "index.js",
-  "scripts": {
-    "dev": "node server.js",
-    "build" : "node index.js"
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/suraj0901/nodessg.git"
   },
   "keywords": [
     "node",
-    "ssg",
     "simple",
     "ssg",
     "static",
