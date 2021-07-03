@@ -22,6 +22,10 @@
     "genrator",
     "ssg"
   ],
+  "dependencies": {
+    "fs-extra": "^10.0.0",
+    "node-fetch": "^2.6.1"
+  },
   "author": "suraj",
   "license": "ISC",
   "bugs": {
