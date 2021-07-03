@@ -9,18 +9,19 @@ npm install nodessg
 ### Node API
 
 ```js
-const nodessg = require('nodessg')
-
-staticSite(config, const main  = async ({$html, $each, $passCopy, $fetch}) => {
-    try {
-        const posts = await (await $fetch('https://jsonplaceholder.typicode.com/posts')).json()
-        $html({}, 'home', '')
-        $html({posts}, 'posts', 'posts')
-        $each(posts, post => $html(post, 'post', `posts/${post.id}`))        
-        $passCopy(['./css', './index.js'])
-    } catch (error) {
-        console.error(error);
-    }
+module.exports = ({
+    input : 'src',
+    output: 'dist'
+    main : async ({$html, $each, $passCopy, $fetch}) => {
+        try {
+            const posts = await (await $fetch('https://jsonplaceholder.typicode.com/posts')).json()
+            $html({}, 'home', '')
+            $html({posts}, 'posts', 'posts')
+            $each(posts, post => $html(post, 'post', `posts/${post.id}`))        
+            $passCopy(['./css', './index.js'])
+        } catch (error) {
+            console.error(error);
+        }
 })
 ```
 ### CLI
