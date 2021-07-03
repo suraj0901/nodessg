@@ -1,20 +1,31 @@
 {
   "name": "nodessg",
   "version": "1.0.0",
-  "description": "A simple node static site generator ",
+  "description": "A simple node static site genrator",
   "main": "index.js",
+  "bin": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node server.js",
+    "build" : "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/suraj0901/nodessg.git"
   },
   "keywords": [
     "node",
     "ssg",
+    "simple",
+    "ssg",
     "static",
     "site",
     "genrator",
-    "simple",
     "ssg"
   ],
-  "author": "suraj jha",
-  "license": "ISC"
+  "author": "suraj",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/suraj0901/nodessg/issues"
+  },
+  "homepage": "https://github.com/suraj0901/nodessg#readme"
 }
