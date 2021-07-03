@@ -3,7 +3,7 @@
 ## Install
 
 ```
-npm install static-site -g
+npm install nodessg
 ```
 
 ### Node API
