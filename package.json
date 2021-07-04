@@ -1,6 +1,6 @@
 {
   "name": "nodessg",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A simple node static site genrator",
   "main": "./bin/index.js",
   "bin" : {

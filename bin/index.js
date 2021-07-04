@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const server = require('../../server')
+const server = require('../server')
 const fs = require('fs');
 const path = require('path');
 const fse = require('fs-extra');
