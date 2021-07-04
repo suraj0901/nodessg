@@ -1,15 +1,14 @@
 #!/usr/bin/env node
 
-const server = require('../server')
+const server = require('../../server')
 const fs = require('fs');
 const path = require('path');
 const fse = require('fs-extra');
 const fetch = require('node-fetch')
 
+const rootPath = filePath => path.join(__dirname,'..',filePath)
 const param = process.argv.slice(2), index = param[0], dev = param[1] === "--dev"
-console.log(param);
-
-const config= require(__dirname + '/' +index)
+const { config, main } = require(rootPath(index))
 
 const $fetch = async (path) => {
   try {
@@ -22,8 +21,8 @@ const $fetch = async (path) => {
 
 const $passCopy = (arr) => {
   arr.forEach((eachpath) => {
-    const srcDir = path.join(__dirname, config.input, eachpath)
-    const destDir = path.join(__dirname, config.output, eachpath)
+    const srcDir = rootPath(config.input+'/'+eachpath)
+    const destDir = rootPath(config.output+'/'+eachpath)
     fse.copySync(srcDir, destDir,{ overwrite: true}, function (err) {
       if (err) {      
         console.log(err);      
@@ -71,7 +70,8 @@ const transform = async (data, text) => {
 
 const $include = async (data = {}, path ) => {
   try {
-    const text = fs.readFileSync(`./${config.input}/${path}.xht`,'utf8')
+    const pathFormRoot = rootPath(`${config.input}/${path}.xht`)
+    const text = fs.readFileSync(pathFormRoot,'utf8')
     const res = await transform(data, text)
     return res
   } catch (error) {
@@ -91,18 +91,24 @@ const mkdir = dirname => {
 
 const write = (outPutPath, res) => {
   const path = outPutPath.split('/')
-  let folderName = `./${config.output}`
+  let folderName = rootPath(config.output)
   for (let i = 0; i < path.length; i++) {
     folderName += '/' +path[i]
     mkdir(`${folderName}`)
   }
-  fs.writeFileSync(`./${config.output}/${outPutPath}/index.html`, res)
-  console.log(`File written to ./${config.output}/${outPutPath}/index.html`)
+  try {
+    const pathFormRoot = rootPath(`${config.output}/${outPutPath}/index.html`) 
+    fs.writeFileSync(pathFormRoot, res)
+    console.log(`File written to ./${config.output}/${outPutPath}/index.html`)
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 const $html = async (data, input, output) => {
   try {
-      const text = fs.readFileSync(`./${config.input}/${input}.xht`, 'utf8')
+    const pathFormRoot = rootPath(`${config.input}/${input}.xht`)
+      const text = fs.readFileSync(pathFormRoot, 'utf8')
       const res = await transform(data, text)
       write(output, res)
   } catch (err) {
@@ -110,19 +116,17 @@ const $html = async (data, input, output) => {
   }
 }
 
-// mkdir(config.output)
+mkdir(config.output)
 
-// config.main({$html, $include, $each, $fetch, $passCopy})
-//   .then(() => {
-//     if (dev) {
-//       const p = (param[2] === "-p")
-//       const para = {
-//         output : config.output
-//       } 
-//       if (p) para.port = param[3] /*parseInt(param[3])*/    
-//       server(para)
-//     } 
-//   })
-//   .catch(err => console.error(err))
+const checkDev = () => {
+  if (dev) {
+    const p = (param[2] === "-p")
+    const para = {
+      output : config.output
+    } 
+    if (p) para.port = param[3] /*parseInt(param[3])*/    
+    server(para)
+  } 
+}
 
-console.log("Success");
+main({$html, $include, $each, $fetch, $passCopy}).then(checkDev).catch(err => console.error(err))

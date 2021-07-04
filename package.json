@@ -2,9 +2,9 @@
   "name": "nodessg",
   "version": "1.0.1",
   "description": "A simple node static site genrator",
-  "main": "./bin/nodessg.js",
+  "main": "./bin/index.js",
   "bin" : {
-    "nodessg" : "./bin/nodessg.js"
+    "nodessg" : "./bin/index.js"
   },
   "repository": {
     "type": "git",
