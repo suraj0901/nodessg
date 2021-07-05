@@ -6,7 +6,7 @@ const fse = require('fs-extra');
 const fetch = require('node-fetch')
 
 const param = process.argv.slice(2), index = param[0]
-const { input, output , main } = require(`${__dirname}/${index}`)
+const { input, output , main } = require(`${__dirname}/../../../${index}`)
 
 const $fetch = async (path) => {
   try {
