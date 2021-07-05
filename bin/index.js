@@ -1,14 +1,12 @@
 #!/usr/bin/env node
 
-const server = require('../server')
+const http = require("http");
 const fs = require('fs');
-const path = require('path');
 const fse = require('fs-extra');
 const fetch = require('node-fetch')
 
-const rootPath = filePath => path.join(__dirname,'..',filePath)
-const param = process.argv.slice(2), index = param[0], dev = param[1] === "--dev"
-const { config, main } = require(rootPath(index))
+const param = process.argv.slice(2), index = param[0]
+const { input, output , main } = require(`${__dirname}/../${index}`)
 
 const $fetch = async (path) => {
   try {
@@ -21,13 +19,13 @@ const $fetch = async (path) => {
 
 const $passCopy = (arr) => {
   arr.forEach((eachpath) => {
-    const srcDir = rootPath(config.input+'/'+eachpath)
-    const destDir = rootPath(config.output+'/'+eachpath)
+    const srcDir = input+'/'+eachpath
+    const destDir = output+'/'+eachpath
     fse.copySync(srcDir, destDir,{ overwrite: true}, function (err) {
       if (err) {      
         console.log(err);      
       } else {
-        console.log(`${eachpath} is copied from ${config.input} from ${config.output}`);
+        console.log(`${eachpath} is copied from ${input} from ${output}`);
       }
     })
   })
@@ -70,7 +68,7 @@ const transform = async (data, text) => {
 
 const $include = async (data = {}, path ) => {
   try {
-    const pathFormRoot = rootPath(`${config.input}/${path}.xht`)
+    const pathFormRoot = `${input}/${path}.xht`
     const text = fs.readFileSync(pathFormRoot,'utf8')
     const res = await transform(data, text)
     return res
@@ -91,42 +89,70 @@ const mkdir = dirname => {
 
 const write = (outPutPath, res) => {
   const path = outPutPath.split('/')
-  let folderName = rootPath(config.output)
+  let folderName = output
   for (let i = 0; i < path.length; i++) {
     folderName += '/' +path[i]
     mkdir(`${folderName}`)
   }
   try {
-    const pathFormRoot = rootPath(`${config.output}/${outPutPath}/index.html`) 
+    const pathFormRoot = `${output}/${outPutPath}/index.html` 
     fs.writeFileSync(pathFormRoot, res)
-    console.log(`File written to ./${config.output}/${outPutPath}/index.html`)
+    console.log(`File written to ./${output}/${outPutPath}/index.html`)
   } catch (error) {
     console.log(error);
   }
 }
 
-const $html = async (data, input, output) => {
+const $html = async (data, inputTemp, outputHtml) => {
   try {
-    const pathFormRoot = rootPath(`${config.input}/${input}.xht`)
+    const pathFormRoot = `${input}/${inputTemp}.xht`
       const text = fs.readFileSync(pathFormRoot, 'utf8')
       const res = await transform(data, text)
-      write(output, res)
+      write(outputHtml, res)
   } catch (err) {
       console.error(err)
   }
 }
 
-mkdir(config.output)
-
-const checkDev = () => {
-  if (dev) {
-    const p = (param[2] === "-p")
-    const para = {
-      output : config.output
-    } 
-    if (p) para.port = param[3] /*parseInt(param[3])*/    
-    server(para)
-  } 
+const server = (port=8000) => {
+  const host = 'localhost';    
+  const requestListener = function (req, res) {
+    const path = `${output}/${req.url}/index.html`
+    try {
+        const file = fs.readFileSync(path)
+        res.setHeader("Content-Type", "text/html");
+        res.writeHead(200);
+        res.end(file);
+    } catch (error) {
+        res.writeHead(500);
+        res.end(`error is ${error}`)
+        return
+    }
+  };
+  
+  try {
+    const server = http.createServer(requestListener);
+    server.listen(port, host, () => {
+        console.log(`Server is running on http://${host}:${port}`);
+    });
+    
+  } catch (error) {
+      console.log(error);
+  }
 }
 
-main({$html, $include, $each, $fetch, $passCopy}).then(checkDev).catch(err => console.error(err))
+const checkDev = () => {
+  if(param[1] && param[1] === "--dev"){
+    let port 
+    if (param[1] && param[1] === "-p") port = param[2] /*parseInt(param[3])*/    
+    // console.log(param);
+    server(port)
+  }
+}
+
+mkdir(output)
+
+main({ $html, $each, $include, $passCopy, $fetch })
+  .then(checkDev)
+  .catch(err => console.error(err))
+
